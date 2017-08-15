@@ -7,7 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace ZhongcaiSocket
+namespace TestMySocketHelper
 {
     /// <summary>
     /// ClassName:SocketHelper
@@ -446,7 +446,7 @@ namespace ZhongcaiSocket
                 ip = new IPEndPoint(Ipaddress, Port);
                 client = new TcpClient();
             }
-            public void SendData(string SendData)
+            public void SendStrData(string SendData)
             {
                 try
                 {
@@ -466,6 +466,36 @@ namespace ZhongcaiSocket
                         }
                         byte[] buffer = Encoding.Default.GetBytes(SendData);
                         nStream.Write(buffer, 0, buffer.Length);
+                    }
+                }
+                catch (Exception skex)
+                {
+                    Sockets sks = new Sockets();
+                    sks.ex = skex;
+                    sks.ClientDispose = true;
+                    pushSockets.Invoke(sks);//推送至UI
+                }
+            }
+            public void SendByteData(byte[] SendByteData,int Slen)
+            {
+                try
+                {
+
+                    if (client == null || !client.Connected)
+                    {
+                        Sockets sks = new Sockets();
+                        sks.ex = new Exception("客户端无连接..");
+                        sks.ClientDispose = true;
+                        pushSockets.Invoke(sks);//推送至UI 
+                    }
+                    if (client.Connected) //如果连接则发送
+                    {
+                        if (nStream == null)
+                        {
+                            nStream = client.GetStream();
+                        }
+                        //byte[] buffer = Encoding.Default.GetBytes(SendData);
+                        nStream.Write(SendByteData, 0, Slen);
                     }
                 }
                 catch (Exception skex)
